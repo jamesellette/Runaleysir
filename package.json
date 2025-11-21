@@ -16,16 +16,22 @@
     "dist-all": "npm run build && electron-builder -mwl",
     "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": ["cipher", "cryptography", "ai", "electron", "desktop"],
+  "keywords": [
+    "cipher",
+    "cryptography",
+    "ai",
+    "electron",
+    "desktop"
+  ],
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "electron": "^28.0.0",
-    "electron-builder": "^24.0.0",
-    "concurrently": "^8.0.0"
+    "electron-builder": "^24.0.0"
   },
   "dependencies": {
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.2.0"
   },
   "build": {
     "appId": "com.runaleysir.app",

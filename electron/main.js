@@ -173,3 +173,26 @@ ipcMain.handle('update-usage-stats', async (event, stats) => {
   store.set('usage_stats', stats);
   return { success: true };
 });
+
+// Cipher analysis handler
+ipcMain.handle('analyze-cipher', async (event, cipherData) => {
+  try {
+    const { CipherAnalysisEngine } = require('./analysis/engine');
+    const engine = new CipherAnalysisEngine(cipherData.api_key);
+    
+    // Run the analysis
+    const result = await engine.analyzeCipher(
+      cipherData.cipher_text,
+      cipherData.historical_context || ''
+    );
+    
+    // Update usage stats
+    const stats = engine.getUsageStatistics();
+    store.set('usage_stats', stats);
+    
+    return result;
+  } catch (error) {
+    console.error('Analysis error:', error);
+    return { error: error.message };
+  }
+});

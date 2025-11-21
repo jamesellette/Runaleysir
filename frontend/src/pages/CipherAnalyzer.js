@@ -43,22 +43,16 @@ function CipherAnalyzer() {
     });
 
     try {
-      // Import the analysis engine
-      const { CipherAnalysisEngine } = require('../../electron/analysis/engine');
-      const engine = new CipherAnalysisEngine(apiKey);
+      // Call backend API through electronAPI
+      const result = await window.electronAPI.analyzeCipher({
+        cipher_text: cipherText,
+        historical_context: historicalContext,
+        api_key: apiKey
+      });
 
-      // Run analysis with progress callback
-      const result = await engine.analyzeCipher(
-        cipherText,
-        historicalContext,
-        (progress) => {
-          setAnalysis(prev => ({
-            ...prev,
-            currentStage: progress.message,
-            progress: progress.progress
-          }));
-        }
-      );
+      if (result.error) {
+        throw new Error(result.error);
+      }
 
       setAnalysis({
         isAnalyzing: false,
@@ -67,10 +61,6 @@ function CipherAnalyzer() {
         results: result,
         error: null
       });
-
-      // Update usage stats
-      const stats = engine.getUsageStatistics();
-      await window.electronAPI.updateUsageStats(stats);
 
     } catch (error) {
       setAnalysis({

@@ -8,18 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveAnalysisResult: (data) => ipcRenderer.invoke('save-analysis-result', data),
   
   // Backend communication
-  analyzeCipher: async (cipherData) => {
-    try {
-      const response = await fetch('http://localhost:8001/analyze/cipher', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cipherData)
-      });
-      return await response.json();
-    } catch (error) {
-      return { error: error.message };
-    }
-  },
+  analyzeCipher: (cipherData) => ipcRenderer.invoke('analyze-cipher', cipherData),
   
   checkBackendHealth: async () => {
     try {

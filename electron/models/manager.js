@@ -1,5 +1,6 @@
 // electron/models/manager.js
 const { AI_MODELS } = require('./config');
+const https = require('https');
 
 class ModelManager {
   constructor(apiKey) {
@@ -71,23 +72,7 @@ class ModelManager {
     }
 
     try {
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'Runaleysir'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-
-      const data = await response.json();
+      const data = await this.makeHttpsRequest('/chat/completions', requestBody);
       
       // Track usage
       this.trackUsage(model.id, data.usage);
@@ -104,6 +89,54 @@ class ModelManager {
       console.error(`Error calling ${model.name}:`, error);
       throw error;
     }
+  }
+
+  // Make HTTPS request using Node.js https module
+  makeHttpsRequest(path, body) {
+    return new Promise((resolve, reject) => {
+      const postData = JSON.stringify(body);
+      
+      const options = {
+        hostname: 'openrouter.ai',
+        port: 443,
+        path: `/api/v1${path}`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'Runaleysir'
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            try {
+              resolve(JSON.parse(data));
+            } catch (error) {
+              reject(new Error(`Failed to parse response: ${error.message}`));
+            }
+          } else {
+            reject(new Error(`API call failed: ${res.statusCode} ${res.statusMessage} - ${data}`));
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      req.write(postData);
+      req.end();
+    });
   }
 
   // Call model by task type (convenience method)
