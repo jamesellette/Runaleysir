@@ -1,0 +1,67 @@
+{
+  "name": "runaleysir",
+  "version": "1.0.0",
+  "description": "AI-powered historical cipher analysis tool",
+  "main": "electron/main.js",
+  "scripts": {
+    "electron": "electron .",
+    "electron-dev": "NODE_ENV=development electron .",
+    "frontend-dev": "cd frontend && npm start",
+    "backend-dev": "cd backend && python api.py",
+    "dev": "concurrently \"npm run frontend-dev\" \"npm run backend-dev\" \"npm run electron-dev\"",
+    "build-frontend": "cd frontend && npm run build",
+    "build-backend": "cd backend && pyinstaller api.py --onefile",
+    "build": "npm run build-frontend && npm run build-backend",
+    "dist": "electron-builder",
+    "dist-all": "npm run build && electron-builder -mwl",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "cipher",
+    "cryptography",
+    "ai",
+    "electron",
+    "desktop"
+  ],
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "build": {
+    "appId": "com.runaleysir.app",
+    "productName": "Runaleysir",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "frontend/build/**/*",
+      "backend/dist/**/*",
+      "shared/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist/",
+        "to": "backend/"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}
