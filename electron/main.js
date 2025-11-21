@@ -13,9 +13,14 @@ function startBackend() {
   const pythonPath = isDev 
     ? 'python' 
     : path.join(process.resourcesPath, 'backend', 'api.exe');
+  
+  // Set correct working directory for backend
+  const backendPath = isDev
+    ? path.join(__dirname, '..', 'backend', 'api.py')
+    : path.join(process.resourcesPath, 'backend', 'api.py');
     
-  pythonBackend = spawn(pythonPath, ['backend/api.py'], {
-    cwd: __dirname
+  pythonBackend = spawn(pythonPath, [backendPath], {
+    cwd: isDev ? path.join(__dirname, '..') : process.resourcesPath
   });
   
   pythonBackend.stdout.on('data', (data) => {

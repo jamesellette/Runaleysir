@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Container, Paper, TextField, Button,
-  LinearProgress, Typography, Grid, Alert, Box, Card, CardContent
+  LinearProgress, Typography, Grid, Alert, Box, Card, CardContent,
+  Snackbar
 } from '@mui/material';
 import { Send, FolderOpen, Save } from '@mui/icons-material';
 
@@ -14,6 +15,11 @@ function CipherAnalyzer() {
     progress: 0,
     results: null,
     error: null
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
   });
 
   const handleAnalyze = async () => {
@@ -87,7 +93,17 @@ function CipherAnalyzer() {
     
     const result = await window.electronAPI.saveAnalysisResult(analysis.results);
     if (result.success) {
-      alert(`Results saved to: ${result.path}`);
+      setSnackbar({
+        open: true,
+        message: `Results saved to: ${result.path}`,
+        severity: 'success'
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: 'Failed to save results',
+        severity: 'error'
+      });
     }
   };
 
@@ -233,6 +249,21 @@ function CipherAnalyzer() {
           )}
         </Grid>
       </Grid>
+      
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

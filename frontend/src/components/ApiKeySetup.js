@@ -86,7 +86,7 @@ function ApiKeySetup({ open, onClose }) {
 
           <Alert severity="info" style={{ marginBottom: 20 }}>
             <strong>Get your free API key:</strong>
-            <br />1. Go to <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer">openrouter.ai</a>
+            <br />1. Go to openrouter.ai (opens in your browser)
             <br />2. Sign up for an account
             <br />3. Navigate to "Keys" in your dashboard
             <br />4. Create a new API key
